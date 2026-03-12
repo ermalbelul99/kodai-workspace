@@ -1,5 +1,4 @@
 import { useAppStore } from '@/store/useAppStore';
-import { Badge } from '@/components/ui/badge';
 import { Zap, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
