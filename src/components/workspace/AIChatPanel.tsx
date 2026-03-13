@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +15,7 @@ const mockResponses = [
 ];
 
 export const AIChatPanel = () => {
+  const { t } = useTranslation();
   const chatMessages = useAppStore((s) => s.chatMessages);
   const addChatMessage = useAppStore((s) => s.addChatMessage);
   const [input, setInput] = useState('');
@@ -31,7 +33,6 @@ export const AIChatPanel = () => {
     setInput('');
     setIsTyping(true);
 
-    // TODO: Replace with actual Supabase Edge Function call
     setTimeout(() => {
       const response = mockResponses[Math.floor(Math.random() * mockResponses.length)];
       addChatMessage({ role: 'assistant', content: response });
@@ -48,10 +49,8 @@ export const AIChatPanel = () => {
               <Bot className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground">AI Tutor</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Ask me anything about the challenge!
-              </p>
+              <p className="text-sm font-medium text-foreground">{t('chat.title')}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t('chat.subtitle')}</p>
             </div>
           </div>
         )}
@@ -109,7 +108,7 @@ export const AIChatPanel = () => {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask the AI tutor..."
+            placeholder={t('chat.placeholder')}
             className="bg-muted border-border text-sm font-mono"
           />
           <Button type="submit" size="icon" disabled={!input.trim() || isTyping} className="flex-shrink-0">

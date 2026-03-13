@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppStore, type Challenge } from '@/store/useAppStore';
 import { ChallengeCard } from '@/components/ChallengeCard';
@@ -11,6 +12,7 @@ import { toast } from 'sonner';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { profile, setActiveChallenge, userProgress, setUserProgress } = useAppStore();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
 
@@ -20,7 +22,7 @@ const Dashboard = () => {
         .from('challenges')
         .select('*')
         .order('order_index');
-      if (challengeData) setChallenges(challengeData);
+      if (challengeData) setChallenges(challengeData as unknown as Challenge[]);
 
       if (profile) {
         const { data: progressData } = await supabase
@@ -40,15 +42,14 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    toast.success('Logged out');
+    toast.success(t('common.logout'));
   };
 
   const completedCount = userProgress.filter((p) => p.status === 'completed').length;
-  const streak = Math.min(completedCount, 7); // mock streak
+  const streak = Math.min(completedCount, 7);
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
         <div className="container flex items-center justify-between py-4">
           <div className="flex items-center gap-3">
@@ -69,7 +70,6 @@ const Dashboard = () => {
       </header>
 
       <main className="container py-8 space-y-8">
-        {/* Stats Row */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -81,7 +81,7 @@ const Dashboard = () => {
                 <Trophy className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground font-mono">Level</p>
+                <p className="text-xs text-muted-foreground font-mono">{t('dashboard.level')}</p>
                 <p className="text-2xl font-bold text-foreground">{profile?.current_level || 1}</p>
               </div>
             </div>
@@ -92,7 +92,7 @@ const Dashboard = () => {
                 <Zap className="h-5 w-5 text-accent" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground font-mono">Total XP</p>
+                <p className="text-xs text-muted-foreground font-mono">{t('dashboard.totalXP')}</p>
                 <p className="text-2xl font-bold text-xp">{profile?.xp_points || 0}</p>
               </div>
             </div>
@@ -103,14 +103,13 @@ const Dashboard = () => {
                 <Flame className="h-5 w-5 text-difficulty-medium" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground font-mono">Streak</p>
+                <p className="text-xs text-muted-foreground font-mono">{t('dashboard.streak')}</p>
                 <p className="text-2xl font-bold text-foreground">{streak} 🔥</p>
               </div>
             </div>
           </div>
         </motion.div>
 
-        {/* XP Progress */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -120,13 +119,12 @@ const Dashboard = () => {
           <XPProgressBar currentXP={profile?.xp_points || 0} level={profile?.current_level || 1} />
         </motion.div>
 
-        {/* Challenges Grid */}
         <div>
           <div className="flex items-center gap-2 mb-5">
             <Target className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-bold text-foreground">Challenges</h2>
+            <h2 className="text-lg font-bold text-foreground">{t('dashboard.challenges')}</h2>
             <span className="font-mono text-xs text-muted-foreground">
-              {completedCount}/{challenges.length} completed
+              {completedCount}/{challenges.length} {t('dashboard.completed')}
             </span>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

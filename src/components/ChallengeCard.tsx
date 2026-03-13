@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
-import { Lock, CheckCircle2, Zap, Code2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { CheckCircle2, Zap, Code2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Challenge, UserProgress } from '@/store/useAppStore';
+import { getLocalizedTitle, getLocalizedDescription } from '@/lib/i18n-challenge';
 
 interface ChallengeCardProps {
   challenge: Challenge;
@@ -10,15 +12,18 @@ interface ChallengeCardProps {
   onClick: () => void;
 }
 
-const difficultyConfig = {
-  easy: { label: 'Easy', className: 'text-difficulty-easy border-difficulty-easy/30 bg-difficulty-easy/10' },
-  medium: { label: 'Medium', className: 'text-difficulty-medium border-difficulty-medium/30 bg-difficulty-medium/10' },
-  hard: { label: 'Hard', className: 'text-difficulty-hard border-difficulty-hard/30 bg-difficulty-hard/10' },
-};
-
 export const ChallengeCard = ({ challenge, progress, index, onClick }: ChallengeCardProps) => {
+  const { t } = useTranslation();
   const isCompleted = progress?.status === 'completed';
-  const diff = difficultyConfig[challenge.difficulty as keyof typeof difficultyConfig] || difficultyConfig.easy;
+  const difficultyKey = challenge.difficulty as 'easy' | 'medium' | 'hard';
+
+  const difficultyConfig = {
+    easy: { className: 'text-difficulty-easy border-difficulty-easy/30 bg-difficulty-easy/10' },
+    medium: { className: 'text-difficulty-medium border-difficulty-medium/30 bg-difficulty-medium/10' },
+    hard: { className: 'text-difficulty-hard border-difficulty-hard/30 bg-difficulty-hard/10' },
+  };
+
+  const diff = difficultyConfig[difficultyKey] || difficultyConfig.easy;
 
   return (
     <motion.button
@@ -48,16 +53,16 @@ export const ChallengeCard = ({ challenge, progress, index, onClick }: Challenge
           </div>
           <div>
             <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-              {challenge.title}
+              {getLocalizedTitle(challenge)}
             </h3>
-            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{challenge.description}</p>
+            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{getLocalizedDescription(challenge)}</p>
           </div>
         </div>
       </div>
 
       <div className="mt-4 flex items-center justify-between">
         <span className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-mono font-medium", diff.className)}>
-          {diff.label}
+          {t(`difficulty.${difficultyKey}`)}
         </span>
         <span className="inline-flex items-center gap-1 text-xs font-mono text-xp">
           <Zap className="h-3 w-3" />

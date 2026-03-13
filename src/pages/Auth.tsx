@@ -1,12 +1,15 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Code2, Zap } from 'lucide-react';
+import { LanguageToggle } from '@/components/LanguageToggle';
 
 export const AuthPage = () => {
+  const { t } = useTranslation();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,7 +24,7 @@ export const AuthPage = () => {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        toast.success('Welcome back!');
+        toast.success(t('auth.loginSuccess'));
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -32,7 +35,7 @@ export const AuthPage = () => {
           },
         });
         if (error) throw error;
-        toast.success('Account created! Check your email to verify.');
+        toast.success(t('auth.signupSuccess'));
       }
     } catch (err: any) {
       toast.error(err.message);
@@ -42,7 +45,10 @@ export const AuthPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4 relative">
+      <div className="fixed top-3 right-3 z-[100]">
+        <LanguageToggle />
+      </div>
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-2 glow-cyan">
@@ -50,17 +56,17 @@ export const AuthPage = () => {
             <span className="font-mono text-sm text-primary font-semibold">KodAI</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            {isLogin ? 'Welcome Back' : 'Start Your Journey'}
+            {isLogin ? t('auth.welcomeBack') : t('auth.startJourney')}
           </h1>
           <p className="text-muted-foreground text-sm">
-            {isLogin ? 'Log in to continue your coding adventure' : 'Create an account and level up your skills'}
+            {isLogin ? t('auth.loginSubtitle') : t('auth.signupSubtitle')}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 rounded-xl border border-border bg-card p-6">
           {!isLogin && (
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-foreground">Username</Label>
+              <Label htmlFor="username" className="text-foreground">{t('auth.username')}</Label>
               <Input
                 id="username"
                 placeholder="coder_x"
@@ -71,7 +77,7 @@ export const AuthPage = () => {
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-foreground">Email</Label>
+            <Label htmlFor="email" className="text-foreground">{t('auth.email')}</Label>
             <Input
               id="email"
               type="email"
@@ -83,7 +89,7 @@ export const AuthPage = () => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-foreground">Password</Label>
+            <Label htmlFor="password" className="text-foreground">{t('auth.password')}</Label>
             <Input
               id="password"
               type="password"
@@ -97,17 +103,17 @@ export const AuthPage = () => {
           </div>
           <Button type="submit" disabled={loading} className="w-full gap-2">
             <Zap className="h-4 w-4" />
-            {loading ? 'Processing...' : isLogin ? 'Log In' : 'Create Account'}
+            {loading ? t('auth.processing') : isLogin ? t('auth.login') : t('auth.createAccount')}
           </Button>
         </form>
 
         <p className="text-center text-sm text-muted-foreground">
-          {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
+          {isLogin ? t('auth.noAccount') : t('auth.haveAccount')}{' '}
           <button
             onClick={() => setIsLogin(!isLogin)}
             className="text-primary hover:underline font-medium"
           >
-            {isLogin ? 'Sign Up' : 'Log In'}
+            {isLogin ? t('auth.signup') : t('auth.login')}
           </button>
         </p>
       </div>

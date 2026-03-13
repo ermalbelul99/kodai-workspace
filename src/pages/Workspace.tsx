@@ -1,11 +1,13 @@
 import { lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, BookOpen, Bot, Code2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getLocalizedTitle } from '@/lib/i18n-challenge';
 
 const CodeEditor = lazy(() => import('@/components/workspace/CodeEditor').then((m) => ({ default: m.CodeEditor })));
 const TerminalPanel = lazy(() => import('@/components/workspace/TerminalPanel').then((m) => ({ default: m.TerminalPanel })));
@@ -54,6 +56,7 @@ const PanelSkeleton = () => (
 
 const Workspace = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const activeChallenge = useAppStore((s) => s.activeChallenge);
   const hasHydrated = useAppStore((s) => s._hasHydrated);
 
@@ -83,7 +86,7 @@ const Workspace = () => {
             <span className="font-mono text-sm font-semibold text-primary">KodAI</span>
           </div>
           <div className="h-4 w-px bg-border" />
-          <span className="text-sm font-medium text-foreground">{activeChallenge.title}</span>
+          <span className="text-sm font-medium text-foreground">{getLocalizedTitle(activeChallenge)}</span>
         </div>
       </header>
 
@@ -93,11 +96,11 @@ const Workspace = () => {
             <TabsList className="mx-3 mt-3 bg-muted border border-border">
               <TabsTrigger value="challenge" className="gap-1.5 text-xs font-mono data-[state=active]:bg-card data-[state=active]:text-primary">
                 <BookOpen className="h-3.5 w-3.5" />
-                Challenge
+                {t('workspace.challenge')}
               </TabsTrigger>
               <TabsTrigger value="chat" className="gap-1.5 text-xs font-mono data-[state=active]:bg-card data-[state=active]:text-primary">
                 <Bot className="h-3.5 w-3.5" />
-                AI Tutor
+                {t('workspace.aiTutor')}
               </TabsTrigger>
             </TabsList>
             <TabsContent value="challenge" className="flex-1 overflow-hidden mt-0">
