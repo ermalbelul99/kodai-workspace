@@ -18,34 +18,52 @@ export type Database = {
         Row: {
           created_at: string
           description: string
+          description_en: string | null
+          description_sq: string | null
           difficulty: string
           expected_output: string
+          expected_output_en: string | null
+          expected_output_sq: string | null
           id: string
           initial_code: string
           order_index: number
           title: string
+          title_en: string | null
+          title_sq: string | null
           xp_reward: number
         }
         Insert: {
           created_at?: string
           description: string
+          description_en?: string | null
+          description_sq?: string | null
           difficulty?: string
           expected_output?: string
+          expected_output_en?: string | null
+          expected_output_sq?: string | null
           id?: string
           initial_code?: string
           order_index?: number
           title: string
+          title_en?: string | null
+          title_sq?: string | null
           xp_reward?: number
         }
         Update: {
           created_at?: string
           description?: string
+          description_en?: string | null
+          description_sq?: string | null
           difficulty?: string
           expected_output?: string
+          expected_output_en?: string | null
+          expected_output_sq?: string | null
           id?: string
           initial_code?: string
           order_index?: number
           title?: string
+          title_en?: string | null
+          title_sq?: string | null
           xp_reward?: number
         }
         Relationships: []
