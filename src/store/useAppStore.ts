@@ -105,6 +105,7 @@ export const useAppStore = create<AppState>()(
         userId: state.userId,
         activeChallenge: state.activeChallenge,
         editorCode: state.editorCode,
+        landingCode: state.landingCode,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
