@@ -17,6 +17,7 @@ const AuthPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const userId = useAppStore(s => s.userId);
+  const setUserId = useAppStore(s => s.setUserId);
   const hasHydrated = useAppStore(s => s._hasHydrated);
 
   const [isLogin, setIsLogin] = useState(searchParams.get('mode') !== 'signup');
@@ -24,6 +25,18 @@ const AuthPage = () => {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Listen for auth state changes so userId updates after login
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (session?.user) {
+          setUserId(session.user.id);
+        }
+      }
+    );
+    return () => subscription.unsubscribe();
+  }, [setUserId]);
 
   useEffect(() => {
     setIsLogin(searchParams.get('mode') !== 'signup');
