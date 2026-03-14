@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppStore } from '@/store/useAppStore';
-import { AuthPage } from '@/pages/Auth';
 
 export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
@@ -10,6 +10,7 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const [retryCount, setRetryCount] = useState(0);
   const { userId, setUserId, setProfile } = useAppStore();
   const authResolved = useRef(false);
+  const location = useLocation();
 
   // Layer 1: Auth state — purely synchronous, no DB calls
   useEffect(() => {
@@ -91,7 +92,20 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  if (loading || !authenticated) return <AuthPage />;
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <span className="font-mono text-xs text-muted-foreground">Loading…</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!authenticated) {
+    return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
 
   return <>{children}</>;
 };

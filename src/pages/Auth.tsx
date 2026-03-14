@@ -1,20 +1,54 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Code2, Zap } from 'lucide-react';
-import { LanguageToggle } from '@/components/LanguageToggle';
 
-export const AuthPage = () => {
+const AuthPage = () => {
   const { t } = useTranslation();
-  const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const userId = useAppStore(s => s.userId);
+  const hasHydrated = useAppStore(s => s._hasHydrated);
+
+  const [isLogin, setIsLogin] = useState(searchParams.get('mode') !== 'signup');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Sync search params → local state (back button support)
+  useEffect(() => {
+    setIsLogin(searchParams.get('mode') !== 'signup');
+  }, [searchParams]);
+
+  // Race-condition-safe navigation: wait for store userId to populate
+  useEffect(() => {
+    if (hasHydrated && userId) {
+      const destination = (location.state as any)?.from?.pathname || '/dashboard';
+      navigate(destination, { replace: true });
+    }
+  }, [hasHydrated, userId, location.state, navigate]);
+
+  // Hydration gate
+  if (!hasHydrated) return null;
+
+  // Authenticated guest guard
+  if (userId) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  const handleToggle = (newIsLogin: boolean) => {
+    setIsLogin(newIsLogin);
+    setSearchParams({ mode: newIsLogin ? 'login' : 'signup' }, { replace: true });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,10 +79,7 @@ export const AuthPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4 relative">
-      <div className="fixed top-3 right-3 z-[100]">
-        <LanguageToggle />
-      </div>
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-2 glow-cyan">
@@ -110,7 +141,7 @@ export const AuthPage = () => {
         <p className="text-center text-sm text-muted-foreground">
           {isLogin ? t('auth.noAccount') : t('auth.haveAccount')}{' '}
           <button
-            onClick={() => setIsLogin(!isLogin)}
+            onClick={() => handleToggle(!isLogin)}
             className="text-primary hover:underline font-medium"
           >
             {isLogin ? t('auth.signup') : t('auth.login')}
@@ -120,3 +151,5 @@ export const AuthPage = () => {
     </div>
   );
 };
+
+export default AuthPage;

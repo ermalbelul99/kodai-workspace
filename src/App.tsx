@@ -7,6 +7,8 @@ import { AuthGuard } from "@/components/AuthGuard";
 import { OnboardingGuard } from "@/components/OnboardingGuard";
 import { LanguageToggle } from "@/components/LanguageToggle";
 
+const Landing = lazy(() => import('./pages/Landing'));
+const AuthPage = lazy(() => import('./pages/Auth'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Workspace = lazy(() => import('./pages/Workspace'));
 const Onboarding = lazy(() => import('./pages/Onboarding'));
@@ -37,30 +39,24 @@ const App = () => (
     <TooltipProvider>
       <Sonner />
       <BrowserRouter>
-        <AuthGuard>
-          <GlobalLayout>
-            <Suspense fallback={<RouteSpinner />}>
-              <Routes>
-                {/* Onboarding lives INSIDE AuthGuard but OUTSIDE OnboardingGuard */}
-                <Route path="/onboarding" element={<Onboarding />} />
+        <GlobalLayout>
+          <Suspense fallback={<RouteSpinner />}>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Landing />} />
+              <Route path="/auth" element={<AuthPage />} />
 
-                {/* All other routes require completed onboarding */}
-                <Route
-                  path="/*"
-                  element={
-                    <OnboardingGuard>
-                      <Routes>
-                        <Route path="/" element={<Dashboard />} />
-                        <Route path="/workspace" element={<Workspace />} />
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
-                    </OnboardingGuard>
-                  }
-                />
-              </Routes>
-            </Suspense>
-          </GlobalLayout>
-        </AuthGuard>
+              {/* Protected: auth only */}
+              <Route path="/onboarding" element={<AuthGuard><Onboarding /></AuthGuard>} />
+
+              {/* Protected: auth + onboarding */}
+              <Route path="/dashboard" element={<AuthGuard><OnboardingGuard><Dashboard /></OnboardingGuard></AuthGuard>} />
+              <Route path="/workspace" element={<AuthGuard><OnboardingGuard><Workspace /></OnboardingGuard></AuthGuard>} />
+
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </GlobalLayout>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

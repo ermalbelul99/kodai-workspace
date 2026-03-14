@@ -77,5 +77,17 @@
   "xp": {
     "level": "Level",
     "xpOf": "XP"
+  },
+  "landing": {
+    "hero_title": "The Future of Programming Starts Here.",
+    "hero_subtitle": "Learn to code through interactive games and an AI Assistant that speaks your language. Built especially for kids and teens in Albania.",
+    "cta_login": "Log In",
+    "cta_signup": "Sign Up Free",
+    "feature_1_title": "Your Personal AI Tutor",
+    "feature_1_desc": "Stuck on code? Our AI assistant explains errors step by step in your language, without giving away the solution.",
+    "feature_2_title": "Learn Through Play",
+    "feature_2_desc": "Earn XP, level up, and conquer challenges designed to make coding feel like a game.",
+    "feature_3_title": "Real Code, Real Skills",
+    "feature_3_desc": "Write actual code in a real editor. No drag-and-drop — learn the skills that matter."
   }
 }
