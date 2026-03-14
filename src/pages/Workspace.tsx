@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react';
+import kodaiLogo from '@/assets/kodai-logo.png';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/store/useAppStore';
@@ -82,7 +83,7 @@ const Workspace = () => {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="flex items-center gap-2">
-            <Code2 className="h-4 w-4 text-primary" />
+            <img src={kodaiLogo} alt="KodAI" className="h-6 w-6 object-contain" />
             <span className="font-mono text-sm font-semibold text-primary">KodAI</span>
           </div>
           <div className="h-4 w-px bg-border" />

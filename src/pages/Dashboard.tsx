@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import kodaiLogo from '@/assets/kodai-logo.png';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
@@ -55,7 +56,7 @@ const Dashboard = () => {
         <div className="container flex items-center justify-between py-4">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 glow-primary">
-              <Code2 className="h-5 w-5 text-primary" />
+              <img src={kodaiLogo} alt="KodAI" className="h-7 w-7 object-contain" />
               <span className="font-mono text-sm font-bold text-primary">KodAI</span>
             </div>
           </div>
