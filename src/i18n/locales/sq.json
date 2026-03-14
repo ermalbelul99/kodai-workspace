@@ -89,5 +89,14 @@
     "feature_2_desc": "Fito XP, ngri nivelin dhe përmbys sfidat e dizajnuara që kodimi të duket si lojë.",
     "feature_3_title": "Kod i Vërtetë, Aftësi të Vërteta",
     "feature_3_desc": "Shkruaj kod të vërtetë në një editor real. Pa drag-and-drop — mëso aftësitë që kanë rëndësi."
+  },
+  "waitlist": {
+    "title": "Nuk je gati të kodosh ende?",
+    "subtitle": "Bashkohu në listën e pritjes dhe do të njoftojmë kur kurse të reja të lançohen.",
+    "placeholder": "emaili@yt.com",
+    "button": "Bashkohu në Listë",
+    "success": "Je në listë! Do të kontaktojmë së shpejti.",
+    "duplicate": "Je tashmë në listën e pritjes!",
+    "invalid": "Ju lutem shkruani një email të vlefshëm."
   }
 }
