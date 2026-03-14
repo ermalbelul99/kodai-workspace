@@ -81,6 +81,9 @@ const AuthPage = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <div className="absolute top-4 right-4">
+        <LanguageToggle />
+      </div>
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-2 glow-cyan">
