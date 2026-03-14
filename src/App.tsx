@@ -5,7 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthGuard } from "@/components/AuthGuard";
 import { OnboardingGuard } from "@/components/OnboardingGuard";
-import { LanguageToggle } from "@/components/LanguageToggle";
+
 
 const Landing = lazy(() => import('./pages/Landing'));
 const AuthPage = lazy(() => import('./pages/Auth'));
