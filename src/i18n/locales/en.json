@@ -89,5 +89,14 @@
     "feature_2_desc": "Earn XP, level up, and conquer challenges designed to make coding feel like a game.",
     "feature_3_title": "Real Code, Real Skills",
     "feature_3_desc": "Write actual code in a real editor. No drag-and-drop — learn the skills that matter."
+  },
+  "waitlist": {
+    "title": "Not ready to code yet?",
+    "subtitle": "Join the waitlist and we'll notify you when new courses launch.",
+    "placeholder": "your@email.com",
+    "button": "Join Waitlist",
+    "success": "You're on the list! We'll be in touch.",
+    "duplicate": "You're already on the waitlist!",
+    "invalid": "Please enter a valid email address."
   }
 }

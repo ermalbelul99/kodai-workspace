@@ -46,6 +46,10 @@ interface AppState {
   addTerminalLine: (line: Omit<TerminalLine, 'id'>) => void;
   clearTerminal: () => void;
 
+  // Landing page code (preserved separately from workspace editorCode)
+  landingCode: string;
+  setLandingCode: (code: string) => void;
+
   // Progress
   userProgress: UserProgress[];
   setUserProgress: (progress: UserProgress[]) => void;
@@ -88,6 +92,9 @@ export const useAppStore = create<AppState>()(
       })),
       clearTerminal: () => set({ terminalLines: [] }),
 
+      landingCode: '',
+      setLandingCode: (code) => set({ landingCode: code }),
+
       userProgress: [],
       setUserProgress: (progress) => set({ userProgress: progress }),
     }),
@@ -98,6 +105,7 @@ export const useAppStore = create<AppState>()(
         userId: state.userId,
         activeChallenge: state.activeChallenge,
         editorCode: state.editorCode,
+        landingCode: state.landingCode,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
