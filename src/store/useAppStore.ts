@@ -46,6 +46,10 @@ interface AppState {
   addTerminalLine: (line: Omit<TerminalLine, 'id'>) => void;
   clearTerminal: () => void;
 
+  // Landing page code (preserved separately from workspace editorCode)
+  landingCode: string;
+  setLandingCode: (code: string) => void;
+
   // Progress
   userProgress: UserProgress[];
   setUserProgress: (progress: UserProgress[]) => void;
