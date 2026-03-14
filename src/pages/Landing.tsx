@@ -1,16 +1,22 @@
+import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
-import { Code2, Bot, Gamepad2 } from 'lucide-react';
+import { Code2, Bot, Gamepad2, ArrowRight } from 'lucide-react';
 import { LanguageToggle } from '@/components/LanguageToggle';
+import { HeroEditor } from '@/components/landing/HeroEditor';
 
 const Landing = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const heroRef = useRef<HTMLDivElement>(null);
 
   const userId = useAppStore(s => s.userId);
   const hasHydrated = useAppStore(s => s._hasHydrated);
+  const setLandingCode = useAppStore(s => s.setLandingCode);
+
+  const [challengeSolved, setChallengeSolved] = useState(false);
 
   // Hydration gate
   if (!hasHydrated) return null;
@@ -19,6 +25,22 @@ const Landing = () => {
   if (userId) {
     return <Navigate to="/dashboard" replace />;
   }
+
+  const scrollToHero = () => {
+    heroRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleChallengeSuccess = () => {
+    setChallengeSolved(true);
+  };
+
+  const handleSignupFromHero = () => {
+    // Preserve the code they wrote
+    setLandingCode(
+      `function greet(name) {\n  return 'Hello, ' + name + '!'\n}\n\nconsole.log(greet('KodAI'))`
+    );
+    navigate('/auth?mode=signup');
+  };
 
   const features = [
     { icon: Bot, titleKey: 'landing.feature_1_title', descKey: 'landing.feature_1_desc' },
@@ -54,59 +76,67 @@ const Landing = () => {
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="mx-auto grid max-w-6xl gap-12 px-4 pt-32 pb-20 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-16 lg:pt-40">
+      {/* Hero — Interactive split-screen */}
+      <section
+        ref={heroRef}
+        id="hero"
+        className="mx-auto grid max-w-6xl gap-10 px-4 pt-28 pb-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-14 lg:pt-36"
+      >
         {/* Left — Copy */}
-        <div className="space-y-6">
-          <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
+        <div className="space-y-5">
+          <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
             {t('landing.hero_title')}
+            <br />
+            <span className="text-gradient-cyan">{t('landing.hero_title_accent')}</span>
           </h1>
-          <p className="max-w-lg text-lg text-muted-foreground">
+          <p className="max-w-md text-base text-muted-foreground leading-relaxed sm:text-lg">
             {t('landing.hero_subtitle')}
           </p>
-          <div className="flex flex-wrap gap-3 pt-2">
-            <Button size="lg" onClick={() => navigate('/auth?mode=signup')}>
-              {t('landing.cta_signup')}
-            </Button>
-            <Button variant="outline" size="lg" onClick={() => navigate('/auth?mode=login')}>
-              {t('landing.cta_login')}
-            </Button>
-          </div>
+
+          {/* Post-success signup CTA */}
+          {challengeSolved && (
+            <div className="animate-slide-up space-y-3 rounded-lg border border-accent/30 bg-accent/5 p-4">
+              <p className="text-sm font-medium text-accent">
+                {t('landing.hero_success')}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {t('landing.hero_signup_cta')}
+              </p>
+              <Button onClick={handleSignupFromHero} className="gap-2">
+                {t('landing.cta_signup_hero')}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+
+          {!challengeSolved && (
+            <div className="flex flex-wrap gap-3 pt-1">
+              <Button size="lg" onClick={() => navigate('/auth?mode=signup')}>
+                {t('landing.cta_signup')}
+              </Button>
+              <Button variant="outline" size="lg" onClick={() => navigate('/auth?mode=login')}>
+                {t('landing.cta_login')}
+              </Button>
+            </div>
+          )}
         </div>
 
-        {/* Right — Decorative code editor */}
-        <div className="relative hidden lg:block">
-          <div className="rounded-xl border border-border bg-card p-4 shadow-lg">
-            {/* Title bar */}
-            <div className="mb-4 flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full bg-destructive/60" />
-              <span className="h-3 w-3 rounded-full bg-accent/60" />
-              <span className="h-3 w-3 rounded-full bg-primary/60" />
-              <span className="ml-2 font-mono text-xs text-muted-foreground">solution.js</span>
-            </div>
-            {/* Fake code lines */}
-            <div className="space-y-2 font-mono text-xs text-muted-foreground">
-              <div><span className="text-primary">function</span> <span className="text-foreground">greet</span>(name) {'{'}</div>
-              <div className="pl-4"><span className="text-primary">return</span> <span className="text-accent-foreground">`Hello, ${'${name}'}!`</span>;</div>
-              <div>{'}'}</div>
-              <div className="pt-2"><span className="text-primary">console</span>.<span className="text-foreground">log</span>(greet(<span className="text-accent-foreground">"KodAI"</span>));</div>
-              <div className="mt-3 rounded border border-primary/20 bg-primary/5 px-3 py-1.5 text-primary">
-                → Hello, KodAI!
-              </div>
-            </div>
-          </div>
+        {/* Right — Interactive Monaco Editor */}
+        <div className="w-full">
+          <HeroEditor onSuccess={handleChallengeSuccess} />
         </div>
       </section>
 
       {/* Features Grid */}
-      <section className="border-t border-border bg-muted/30 py-20">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 md:grid-cols-3">
+      <section className="border-t border-border bg-muted/30 py-16 sm:py-20">
+        <div className="mx-auto grid max-w-6xl gap-6 px-4 sm:px-6 md:grid-cols-3 md:gap-8">
           {features.map(({ icon: Icon, titleKey, descKey }) => (
             <div
               key={titleKey}
-              className="rounded-xl border border-border bg-card p-6 space-y-3 transition-shadow hover:shadow-md"
+              className="group cursor-pointer rounded-xl border border-border bg-card p-6 space-y-3 transition-all hover:shadow-md hover:border-primary/30"
+              onClick={scrollToHero}
             >
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 transition-colors group-hover:bg-primary/20">
                 <Icon className="h-5 w-5 text-primary" />
               </div>
               <h3 className="text-lg font-semibold">{t(titleKey)}</h3>
