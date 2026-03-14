@@ -92,6 +92,9 @@ export const useAppStore = create<AppState>()(
       })),
       clearTerminal: () => set({ terminalLines: [] }),
 
+      landingCode: '',
+      setLandingCode: (code) => set({ landingCode: code }),
+
       userProgress: [],
       setUserProgress: (progress) => set({ userProgress: progress }),
     }),
