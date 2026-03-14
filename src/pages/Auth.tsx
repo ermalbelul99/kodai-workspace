@@ -94,7 +94,7 @@ const AuthPage = () => {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-2 glow-primary">
-            <Code2 className="h-5 w-5 text-primary" />
+            <img src={kodaiLogo} alt="KodAI" className="h-7 w-7 object-contain" />
             <span className="font-mono text-sm text-primary font-semibold">KodAI</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">

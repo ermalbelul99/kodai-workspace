@@ -93,7 +93,7 @@ const Landing = () => {
       <header className="fixed inset-x-0 top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-2">
-            <Code2 className="h-5 w-5 text-primary" />
+            <img src={kodaiLogo} alt="KodAI" className="h-7 w-7 object-contain" />
             <span className="font-mono text-sm font-semibold text-primary">KodAI</span>
           </div>
           <nav className="flex items-center gap-2">
