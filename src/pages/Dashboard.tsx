@@ -58,7 +58,8 @@ const Dashboard = () => {
               <span className="font-mono text-sm font-bold text-primary">KodAI</span>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+           <div className="flex items-center gap-3">
+            <LanguageToggle />
             <span className="text-sm text-muted-foreground font-mono">
               {profile?.username || 'Coder'}
             </span>

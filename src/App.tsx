@@ -27,9 +27,6 @@ const RouteSpinner = () => (
 
 const GlobalLayout = ({ children }: { children: React.ReactNode }) => (
   <div className="relative min-h-screen">
-    <div className="fixed top-3 right-3 z-[100]">
-      <LanguageToggle />
-    </div>
     {children}
   </div>
 );
