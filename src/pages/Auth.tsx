@@ -25,12 +25,10 @@ const AuthPage = () => {
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Sync search params → local state (back button support)
   useEffect(() => {
     setIsLogin(searchParams.get('mode') !== 'signup');
   }, [searchParams]);
 
-  // Race-condition-safe navigation: wait for store userId to populate
   useEffect(() => {
     if (hasHydrated && userId) {
       const destination = (location.state as any)?.from?.pathname || '/dashboard';
@@ -38,13 +36,8 @@ const AuthPage = () => {
     }
   }, [hasHydrated, userId, location.state, navigate]);
 
-  // Hydration gate
   if (!hasHydrated) return null;
-
-  // Authenticated guest guard
-  if (userId) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  if (userId) return <Navigate to="/dashboard" replace />;
 
   const handleToggle = (newIsLogin: boolean) => {
     setIsLogin(newIsLogin);
@@ -86,7 +79,7 @@ const AuthPage = () => {
       </div>
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-2 glow-cyan">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-2 glow-primary">
             <Code2 className="h-5 w-5 text-primary" />
             <span className="font-mono text-sm text-primary font-semibold">KodAI</span>
           </div>
@@ -98,7 +91,7 @@ const AuthPage = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-xl border border-border bg-card p-6">
+        <form onSubmit={handleSubmit} className="space-y-4 rounded-xl glass-card p-6">
           {!isLogin && (
             <div className="space-y-2">
               <Label htmlFor="username" className="text-foreground">{t('auth.username')}</Label>
@@ -107,7 +100,7 @@ const AuthPage = () => {
                 placeholder="coder_x"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="bg-muted border-border font-mono"
+                className="bg-black/30 border-white/10 font-mono"
               />
             </div>
           )}
@@ -120,7 +113,7 @@ const AuthPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="bg-muted border-border"
+              className="bg-black/30 border-white/10"
             />
           </div>
           <div className="space-y-2">
@@ -133,7 +126,7 @@ const AuthPage = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="bg-muted border-border"
+              className="bg-black/30 border-white/10"
             />
           </div>
           <Button type="submit" disabled={loading} className="w-full gap-2">

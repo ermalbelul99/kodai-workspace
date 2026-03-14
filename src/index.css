@@ -6,23 +6,23 @@
 
 @layer base {
   :root {
-    --background: 220 20% 7%;
-    --foreground: 210 20% 90%;
+    --background: 0 0% 2%;
+    --foreground: 0 0% 93%;
 
-    --card: 220 18% 10%;
-    --card-foreground: 210 20% 90%;
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 93%;
 
-    --popover: 220 18% 10%;
-    --popover-foreground: 210 20% 90%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 93%;
 
-    --primary: 187 80% 48%;
-    --primary-foreground: 220 20% 7%;
+    --primary: 4 85% 59%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 16% 16%;
-    --secondary-foreground: 210 20% 80%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 80%;
 
-    --muted: 220 14% 14%;
-    --muted-foreground: 215 12% 50%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 220 9% 64%;
 
     --accent: 150 70% 45%;
     --accent-foreground: 220 20% 7%;
@@ -30,28 +30,28 @@
     --destructive: 0 72% 55%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 220 14% 18%;
-    --input: 220 14% 18%;
-    --ring: 187 80% 48%;
+    --border: 0 0% 12%;
+    --input: 0 0% 12%;
+    --ring: 4 85% 59%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 220 18% 9%;
-    --sidebar-foreground: 210 20% 80%;
-    --sidebar-primary: 187 80% 48%;
-    --sidebar-primary-foreground: 220 20% 7%;
-    --sidebar-accent: 220 16% 14%;
-    --sidebar-accent-foreground: 210 20% 80%;
-    --sidebar-border: 220 14% 18%;
-    --sidebar-ring: 187 80% 48%;
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 0 0% 80%;
+    --sidebar-primary: 4 85% 59%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 0 0% 80%;
+    --sidebar-border: 0 0% 12%;
+    --sidebar-ring: 4 85% 59%;
 
     /* Custom tokens */
     --xp-green: 150 70% 45%;
     --difficulty-easy: 150 70% 45%;
     --difficulty-medium: 45 90% 55%;
     --difficulty-hard: 0 72% 55%;
-    --glow-cyan: 187 80% 48%;
-    --terminal-bg: 220 22% 5%;
+    --glow-primary: 4 85% 59%;
+    --terminal-bg: 0 0% 2%;
     --terminal-green: 120 60% 60%;
   }
 }
@@ -66,23 +66,46 @@
     font-family: 'Space Grotesk', system-ui, sans-serif;
   }
 
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(circle at 40% 30%, hsl(4 85% 59% / 0.06), transparent 60%);
+    pointer-events: none;
+    will-change: transform;
+  }
+
   code, pre, .font-mono {
     font-family: 'JetBrains Mono', monospace;
   }
 }
 
 @layer utilities {
-  .glow-cyan {
-    box-shadow: 0 0 20px hsl(187 80% 48% / 0.15), 0 0 60px hsl(187 80% 48% / 0.05);
+  .glow-primary {
+    box-shadow: 0 0 20px hsl(4 85% 59% / 0.15), 0 0 60px hsl(4 85% 59% / 0.05);
   }
 
   .glow-green {
     box-shadow: 0 0 20px hsl(150 70% 45% / 0.15), 0 0 60px hsl(150 70% 45% / 0.05);
   }
 
-  .text-gradient-cyan {
+  .text-gradient-primary {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(187 80% 48%), hsl(187 60% 65%));
+    background-image: linear-gradient(135deg, hsl(4 85% 59%), hsl(15 80% 65%));
   }
 
   .text-gradient-green {
@@ -90,9 +113,15 @@
     background-image: linear-gradient(135deg, hsl(150 70% 45%), hsl(120 60% 60%));
   }
 
+  .glass-card {
+    background: hsl(0 0% 6%);
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 0 20px rgba(255,59,47,0.02);
+  }
+
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: hsl(220 14% 22%) transparent;
+    scrollbar-color: hsl(0 0% 15%) transparent;
   }
 
   .scrollbar-thin::-webkit-scrollbar {
@@ -104,7 +133,7 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: hsl(220 14% 22%);
+    background: hsl(0 0% 15%);
     border-radius: 3px;
   }
 }

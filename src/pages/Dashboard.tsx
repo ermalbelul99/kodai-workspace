@@ -54,7 +54,7 @@ const Dashboard = () => {
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
         <div className="container flex items-center justify-between py-4">
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 glow-cyan">
+            <div className="flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 glow-primary">
               <Code2 className="h-5 w-5 text-primary" />
               <span className="font-mono text-sm font-bold text-primary">KodAI</span>
             </div>
@@ -77,7 +77,7 @@ const Dashboard = () => {
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-1 gap-4 sm:grid-cols-3"
         >
-          <div className="rounded-xl border border-border bg-card p-5 glow-cyan">
+          <div className="rounded-xl glass-card p-5 glow-primary">
             <div className="flex items-center gap-3">
               <div className="rounded-lg bg-primary/10 p-2.5 border border-primary/20">
                 <Trophy className="h-5 w-5 text-primary" />
@@ -88,7 +88,7 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <div className="rounded-xl border border-border bg-card p-5 glow-green">
+          <div className="rounded-xl glass-card p-5 glow-green">
             <div className="flex items-center gap-3">
               <div className="rounded-lg bg-accent/10 p-2.5 border border-accent/20">
                 <Zap className="h-5 w-5 text-accent" />
@@ -99,7 +99,7 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <div className="rounded-xl border border-border bg-card p-5">
+          <div className="rounded-xl glass-card p-5">
             <div className="flex items-center gap-3">
               <div className="rounded-lg bg-difficulty-medium/10 p-2.5 border border-difficulty-medium/20">
                 <Flame className="h-5 w-5 text-difficulty-medium" />
@@ -116,7 +116,7 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="rounded-xl border border-border bg-card p-5"
+          className="rounded-xl glass-card p-5"
         >
           <XPProgressBar currentXP={profile?.xp_points || 0} level={profile?.current_level || 1} />
         </motion.div>

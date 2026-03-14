@@ -65,8 +65,6 @@ const Onboarding = () => {
         .single();
 
       if (error) throw error;
-
-      // Explicit state sync — no stale guard
       if (data) setProfile(data as any);
 
       toast.success(t('onboarding.success'));
@@ -105,7 +103,7 @@ const Onboarding = () => {
           ))}
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6 shadow-lg space-y-6">
+        <div className="rounded-xl glass-card p-6 shadow-lg space-y-6">
           {/* Step 0 — Age */}
           {step === 0 && (
             <div className="space-y-4">
@@ -125,7 +123,7 @@ const Onboarding = () => {
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
                   placeholder="e.g. 16"
-                  className="font-mono"
+                  className="font-mono bg-black/30 border-white/10"
                 />
               </div>
             </div>
@@ -174,7 +172,7 @@ const Onboarding = () => {
                     className={`flex items-center gap-3 rounded-lg border p-4 transition-colors cursor-pointer ${
                       skillLevel === level
                         ? 'border-primary bg-primary/10'
-                        : 'border-border bg-secondary/50 hover:border-muted-foreground/30'
+                        : 'border-white/5 bg-secondary/50 hover:border-muted-foreground/30'
                     }`}
                     onClick={() => setSkillLevel(level)}
                   >

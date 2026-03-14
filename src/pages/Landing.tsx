@@ -111,13 +111,13 @@ const Landing = () => {
       <section
         ref={heroRef}
         id="hero"
-        className="mx-auto grid max-w-6xl gap-10 px-4 pt-28 pb-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-14 lg:pt-36"
+        className="mx-auto grid max-w-6xl gap-10 px-4 pt-32 pb-24 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-14 lg:pt-40"
       >
         <div className="space-y-5">
-          <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
+          <h1 className="text-5xl font-bold leading-tight tracking-tighter sm:text-6xl lg:text-8xl">
             {t('landing.hero_title')}
             <br />
-            <span className="text-gradient-cyan">{t('landing.hero_title_accent')}</span>
+            <span className="text-gradient-primary">{t('landing.hero_title_accent')}</span>
           </h1>
           <p className="max-w-md text-base text-muted-foreground leading-relaxed sm:text-lg">
             {t('landing.hero_subtitle')}
@@ -152,14 +152,17 @@ const Landing = () => {
       </section>
 
       {/* ── Feature Grid ────────────────────────────── */}
-      <section className="border-t border-border bg-muted/30 py-16 sm:py-20">
+      <section className="border-t border-border py-24 sm:py-32">
         <div className="mx-auto grid max-w-6xl gap-6 px-4 sm:px-6 md:grid-cols-3 md:gap-8">
-          {features.map(({ icon: Icon, titleKey, descKey }) => (
+          {features.map(({ icon: Icon, titleKey, descKey }, i) => (
             <div
               key={titleKey}
-              className="group cursor-pointer rounded-xl border border-border bg-card p-6 space-y-3 transition-all hover:shadow-md hover:border-primary/30"
+              className="group relative cursor-pointer rounded-xl glass-card p-6 space-y-3 transition-all duration-300 hover:border-primary/60 hover:-translate-y-1"
               onClick={scrollToHero}
             >
+              <span className="absolute -left-2 -top-6 text-[8rem] font-bold text-white/[0.03] leading-none select-none pointer-events-none">
+                0{i + 1}
+              </span>
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 transition-colors group-hover:bg-primary/20">
                 <Icon className="h-5 w-5 text-primary" />
               </div>
@@ -171,7 +174,7 @@ const Landing = () => {
       </section>
 
       {/* ── Course Preview Carousel ─────────────────── */}
-      <section className="border-t border-border py-16 sm:py-20">
+      <section className="border-t border-border py-24 sm:py-32">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mb-10 text-center">
             <h2 className="text-2xl font-bold sm:text-3xl">{t('landing.courses_title')}</h2>
@@ -186,7 +189,7 @@ const Landing = () => {
               {courses.map(({ icon: Icon, titleKey, descKey, lessonsKey }) => (
                 <CarouselItem key={titleKey} className="pl-4 md:basis-1/2 lg:basis-1/3">
                   <Card
-                    className="h-full cursor-pointer border-border bg-card transition-all hover:border-primary/30 hover:shadow-md"
+                    className="h-full cursor-pointer glass-card transition-all duration-300 hover:border-primary/60 hover:-translate-y-1"
                     onClick={scrollToHero}
                   >
                     <CardHeader className="pb-3">
@@ -213,7 +216,7 @@ const Landing = () => {
       </section>
 
       {/* ── FAQ ─────────────────────────────────────── */}
-      <section className="border-t border-border bg-muted/30 py-16 sm:py-20">
+      <section className="border-t border-border py-24 sm:py-32">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <h2 className="mb-8 text-center text-2xl font-bold sm:text-3xl">
             {t('landing.faq_title')}
@@ -223,7 +226,7 @@ const Landing = () => {
               <AccordionItem
                 key={i}
                 value={`faq-${i}`}
-                className="rounded-lg border border-border bg-card px-4"
+                className="rounded-lg glass-card px-4"
               >
                 <AccordionTrigger className="text-left text-sm font-medium hover:no-underline sm:text-base">
                   {t(q)}

@@ -42,7 +42,7 @@ export const WaitlistForm = () => {
   };
 
   return (
-    <section className="border-t border-border py-16 sm:py-20">
+    <section className="border-t border-border py-24 sm:py-32">
       <div className="mx-auto max-w-xl px-4 text-center sm:px-6">
         <Mail className="mx-auto mb-4 h-8 w-8 text-primary" />
         <h2 className="text-2xl font-bold sm:text-3xl">{t('waitlist.title')}</h2>
@@ -53,7 +53,7 @@ export const WaitlistForm = () => {
             placeholder={t('waitlist.placeholder')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="flex-1"
+            className="flex-1 bg-black/30 border-white/10"
             maxLength={254}
             required
           />

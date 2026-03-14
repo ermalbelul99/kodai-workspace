@@ -35,9 +35,10 @@ export const ChallengeCard = ({ challenge, progress, index, onClick }: Challenge
       transition={{ delay: index * 0.05, duration: 0.3 }}
       onClick={onClick}
       className={cn(
-        "group relative w-full rounded-xl border bg-card p-5 text-left transition-all duration-200",
-        "hover:border-primary/40 hover:glow-cyan",
-        isCompleted ? "border-accent/30" : "border-border"
+        "group relative w-full rounded-xl bg-card p-5 text-left transition-all duration-300",
+        "border border-white/5 shadow-[0_0_20px_rgba(255,59,47,0.02)]",
+        "hover:border-primary/40 hover:-translate-y-1",
+        isCompleted && "border-accent/30"
       )}
     >
       {isCompleted && (

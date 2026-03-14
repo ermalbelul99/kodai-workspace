@@ -48,7 +48,7 @@ export const HeroEditor = ({ onSuccess }: HeroEditorProps) => {
   }, [code, onSuccess, t]);
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden shadow-lg glow-cyan">
+    <div className="rounded-xl overflow-hidden shadow-lg border-2 border-secondary border-t-primary border-l-primary">
       {/* Title bar */}
       <div className="flex items-center justify-between border-b border-border bg-muted/50 px-4 py-2">
         <div className="flex items-center gap-2">
@@ -80,7 +80,22 @@ export const HeroEditor = ({ onSuccess }: HeroEditorProps) => {
           defaultLanguage="javascript"
           value={code}
           onChange={(v) => setCode(v || '')}
-          theme="vs-dark"
+          theme="kodai-dark"
+          onMount={(_editor, monaco) => {
+            monaco.editor.defineTheme('kodai-dark', {
+              base: 'vs-dark',
+              inherit: true,
+              rules: [],
+              colors: {
+                'editor.background': '#050505',
+                'editor.lineHighlightBackground': '#111111',
+                'editor.selectionBackground': '#FF3B2F33',
+                'editorCursor.foreground': '#FF3B2F',
+                'editorLineNumber.activeForeground': '#FF3B2F',
+              },
+            });
+            monaco.editor.setTheme('kodai-dark');
+          }}
           options={{
             fontSize: 13,
             fontFamily: "'JetBrains Mono', monospace",

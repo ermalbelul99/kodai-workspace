@@ -78,10 +78,23 @@ export const CodeEditor = () => {
         defaultLanguage={monacoLang}
         defaultValue={editorCode}
         onChange={handleChange}
-        onMount={(editor) => {
+        theme="kodai-dark"
+        onMount={(editor, monaco) => {
+          monaco.editor.defineTheme('kodai-dark', {
+            base: 'vs-dark',
+            inherit: true,
+            rules: [],
+            colors: {
+              'editor.background': '#050505',
+              'editor.lineHighlightBackground': '#111111',
+              'editor.selectionBackground': '#FF3B2F33',
+              'editorCursor.foreground': '#FF3B2F',
+              'editorLineNumber.activeForeground': '#FF3B2F',
+            },
+          });
+          monaco.editor.setTheme('kodai-dark');
           editor.onDidBlurEditorWidget(handleBlur);
         }}
-        theme="vs-dark"
         options={{
           fontSize: 14,
           fontFamily: "'JetBrains Mono', monospace",
