@@ -1,53 +1,155 @@
 /**
- * Robust code validation for the interactive landing page challenge.
+ * Code validation for KodAI challenges.
  *
- * Strategy: normalise the user's code (strip whitespace, comments,
- * semicolons; canonicalise quotes) then compare against a normalised
- * expected string AND a fallback regex pattern.
+ * Two strategies:
+ * 1. **Text-based** (JS/Python): normalise → compare / regex.
+ * 2. **DOM-based** (HTML/CSS): parse with DOMParser → query elements,
+ *    check classes, attributes, and content.
  *
- * This ensures variations like:
- *   console.log('Hello')
- *   console.log("Hello");
- *   console.log(  "Hello" )  ;
- * all pass validation.
+ * The public `validateChallenge` signature returns `boolean` so the
+ * rest of the app is unaffected.  Use `validateChallengeDetailed` when
+ * you need per-check error messages.
  */
 
-/** Strip noise so structurally identical code compares equal. */
+// ---------------------------------------------------------------------------
+// Text normalisation (kept for non-HTML challenges)
+// ---------------------------------------------------------------------------
+
 export function normalizeCode(code: string): string {
   return code
-    .replace(/\/\/.*$/gm, '')   // strip single-line comments
-    .replace(/\/\*[\s\S]*?\*\//g, '') // strip multi-line comments
-    .replace(/\s+/g, '')        // collapse all whitespace
-    .replace(/["'`]/g, '"')     // normalise quotes to double
-    .replace(/;/g, '')          // strip semicolons
+    .replace(/\/\/.*$/gm, '')          // single-line comments
+    .replace(/\/\*[\s\S]*?\*\//g, '')  // multi-line comments
+    .replace(/\s+/g, '')               // collapse whitespace
+    .replace(/["'`]/g, '"')            // normalise quotes
+    .replace(/;/g, '')                 // strip semicolons
     .toLowerCase();
 }
 
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+/** A single DOM-level assertion. */
+export interface DomCheck {
+  /** CSS selector that must match at least one element. */
+  selector?: string;
+  /** If provided, at least one matched element must contain this class substring (e.g. "md:"). */
+  classContains?: string;
+  /** If provided, the text content of a matched element must include this string (case-insensitive). */
+  textContains?: string;
+  /** Human-readable failure message shown to the user. */
+  errorMessage: string;
+}
+
 export interface ChallengeSpec {
-  /** The canonical correct code (any quote / whitespace style). */
+  /** Canonical correct code (any quote / whitespace style). */
   expectedCode: string;
-  /** Optional regex applied to the *normalised* string as a fallback. */
+  /** Regex fallback applied to the *normalised* string. */
   pattern?: RegExp;
+  /**
+   * DOM-based checks for HTML/CSS challenges.
+   * When present the validator parses the code with DOMParser and runs
+   * every check; text-based matching is skipped.
+   */
+  domChecks?: DomCheck[];
+}
+
+export interface ValidationResult {
+  passed: boolean;
+  /** Non-empty only when `passed` is false. */
+  errors: string[];
+}
+
+// ---------------------------------------------------------------------------
+// DOM validation
+// ---------------------------------------------------------------------------
+
+function validateDom(html: string, checks: DomCheck[]): ValidationResult {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  const errors: string[] = [];
+
+  for (const check of checks) {
+    // If no selector, skip (safety)
+    if (!check.selector) continue;
+
+    const elements = doc.querySelectorAll(check.selector);
+
+    if (elements.length === 0) {
+      errors.push(check.errorMessage);
+      continue;
+    }
+
+    // Optional: at least one element's className must contain the substring
+    if (check.classContains) {
+      const found = Array.from(elements).some((el) =>
+        el.className.includes(check.classContains!),
+      );
+      if (!found) {
+        errors.push(check.errorMessage);
+        continue;
+      }
+    }
+
+    // Optional: at least one element's textContent must include the string
+    if (check.textContains) {
+      const needle = check.textContains.toLowerCase();
+      const found = Array.from(elements).some((el) =>
+        (el.textContent ?? '').toLowerCase().includes(needle),
+      );
+      if (!found) {
+        errors.push(check.errorMessage);
+      }
+    }
+  }
+
+  return { passed: errors.length === 0, errors };
+}
+
+// ---------------------------------------------------------------------------
+// Text-based validation (JS / Python / generic)
+// ---------------------------------------------------------------------------
+
+function validateText(userCode: string, spec: ChallengeSpec): boolean {
+  const normalised = normalizeCode(userCode);
+  const expected = normalizeCode(spec.expectedCode);
+
+  if (normalised === expected) return true;
+  if (spec.pattern && spec.pattern.test(normalised)) return true;
+
+  return false;
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
+
+/**
+ * Detailed validation — returns per-check error messages.
+ */
+export function validateChallengeDetailed(
+  userCode: string,
+  spec: ChallengeSpec,
+): ValidationResult {
+  // DOM path
+  if (spec.domChecks && spec.domChecks.length > 0) {
+    return validateDom(userCode, spec.domChecks);
+  }
+
+  // Text path
+  const passed = validateText(userCode, spec);
+  return {
+    passed,
+    errors: passed ? [] : [`Expected output does not match.`],
+  };
 }
 
 /**
- * Validate user code against a challenge specification.
- *
- * @returns `true` when the normalised user code matches
- *          the expected code OR the fallback regex.
+ * Simple boolean validation — backward-compatible.
  */
 export function validateChallenge(
   userCode: string,
   spec: ChallengeSpec,
 ): boolean {
-  const normalised = normalizeCode(userCode);
-  const expected = normalizeCode(spec.expectedCode);
-
-  // Primary: exact normalised match
-  if (normalised === expected) return true;
-
-  // Fallback: regex on normalised code
-  if (spec.pattern && spec.pattern.test(normalised)) return true;
-
-  return false;
+  return validateChallengeDetailed(userCode, spec).passed;
 }
