@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react';
+import SuccessCelebration from '@/components/workspace/SuccessCelebration';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/store/useAppStore';
@@ -129,6 +130,7 @@ const Workspace = () => {
           </div>
         </div>
       </div>
+      <SuccessCelebration />
     </div>
   );
 };

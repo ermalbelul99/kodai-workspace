@@ -12,6 +12,7 @@ export const TerminalPanel = () => {
   const clearTerminal = useAppStore((s) => s.clearTerminal);
   const editorCode = useAppStore((s) => s.editorCode);
   const activeChallenge = useAppStore((s) => s.activeChallenge);
+  const triggerCelebration = useAppStore((s) => s.triggerCelebration);
 
   const handleRunCode = useCallback(() => {
     clearTerminal();
@@ -23,12 +24,13 @@ export const TerminalPanel = () => {
       if (mockSuccess) {
         addTerminalLine({ content: `✓ Output matches expected: "${activeChallenge.expected_output}"`, type: 'success' });
         addTerminalLine({ content: `+${activeChallenge.xp_reward} XP earned!`, type: 'success' });
+        triggerCelebration();
       } else {
         addTerminalLine({ content: `✗ Expected: "${activeChallenge.expected_output}" but got different output`, type: 'error' });
         addTerminalLine({ content: 'Try again! Hint: Check your return statement.', type: 'info' });
       }
     }
-  }, [clearTerminal, addTerminalLine, editorCode, activeChallenge]);
+  }, [clearTerminal, addTerminalLine, editorCode, activeChallenge, triggerCelebration]);
 
   return (
     <div className="flex h-full flex-col rounded-lg border border-border bg-terminal overflow-hidden">
