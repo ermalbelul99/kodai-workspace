@@ -107,7 +107,89 @@ function validateDom(html: string, checks: DomCheck[]): ValidationResult {
 }
 
 // ---------------------------------------------------------------------------
-// Text-based validation (JS / Python / generic)
+// Execution-based validation (JS challenges)
+// ---------------------------------------------------------------------------
+
+export interface ExecutionResult {
+  passed: boolean;
+  errors: string[];
+  /** All console.log output captured during execution. */
+  consoleOutput: string[];
+  /** The return value of the last expression (stringified). */
+  returnValue: string | null;
+}
+
+function executeAndValidate(userCode: string, expectedOutput: string): ExecutionResult {
+  const consoleOutput: string[] = [];
+  let returnValue: string | null = null;
+
+  try {
+    // Override console.log to capture output
+    const wrappedCode = `
+      var __logs = [];
+      var __origLog = console.log;
+      console.log = function() {
+        var args = Array.prototype.slice.call(arguments);
+        __logs.push(args.map(String).join(' '));
+        __origLog.apply(console, arguments);
+      };
+      try {
+        ${userCode}
+      } finally {
+        console.log = __origLog;
+      }
+    `;
+
+    // Use Function constructor to execute in isolated scope
+    const fn = new Function(wrappedCode + '\nreturn __logs;');
+    const logs: string[] = fn();
+    consoleOutput.push(...logs);
+
+    // Also try evaluating the last expression for a return value
+    try {
+      const lines = userCode.trim().split('\n');
+      const lastLine = lines[lines.length - 1].trim();
+      // If last line looks like an expression (not a declaration), evaluate the whole thing
+      if (lastLine && !lastLine.startsWith('function ') && !lastLine.startsWith('const ') &&
+          !lastLine.startsWith('let ') && !lastLine.startsWith('var ') && !lastLine.startsWith('//')) {
+        const evalFn = new Function(`${userCode}\nreturn ${lastLine};`);
+        const result = evalFn();
+        if (result !== undefined) {
+          returnValue = String(result);
+        }
+      }
+    } catch {
+      // Last-line eval failed — that's fine, rely on console output
+    }
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      passed: false,
+      errors: [`Runtime error: ${message}`],
+      consoleOutput,
+      returnValue: null,
+    };
+  }
+
+  // Compare: check console output first, then return value
+  const expected = expectedOutput.trim().toLowerCase();
+  const allOutput = consoleOutput.join('\n').trim().toLowerCase();
+
+  if (allOutput === expected || (returnValue !== null && returnValue.trim().toLowerCase() === expected)) {
+    return { passed: true, errors: [], consoleOutput, returnValue };
+  }
+
+  const actual = consoleOutput.length > 0 ? consoleOutput.join('\n') : (returnValue ?? '(no output)');
+  return {
+    passed: false,
+    errors: [`Expected output: "${expectedOutput.trim()}", but got: "${actual}"`],
+    consoleOutput,
+    returnValue,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Text-based validation (fallback for non-executable, non-DOM challenges)
 // ---------------------------------------------------------------------------
 
 function validateText(userCode: string, spec: ChallengeSpec): boolean {
@@ -126,22 +208,30 @@ function validateText(userCode: string, spec: ChallengeSpec): boolean {
 
 /**
  * Detailed validation — returns per-check error messages.
+ * For JS challenges (no domChecks), executes the code and compares output.
  */
 export function validateChallengeDetailed(
   userCode: string,
   spec: ChallengeSpec,
-): ValidationResult {
-  // DOM path
+): ValidationResult & { consoleOutput?: string[]; returnValue?: string | null } {
+  // DOM path (HTML/CSS challenges)
   if (spec.domChecks && spec.domChecks.length > 0) {
     return validateDom(userCode, spec.domChecks);
   }
 
-  // Text path
-  const passed = validateText(userCode, spec);
-  return {
-    passed,
-    errors: passed ? [] : [`Expected output does not match.`],
-  };
+  // Execution path (JS challenges) — preferred when expectedCode looks like an output value
+  const execResult = executeAndValidate(userCode, spec.expectedCode);
+  if (execResult.passed) {
+    return execResult;
+  }
+
+  // Fallback: text-based comparison (for edge cases)
+  const textPassed = validateText(userCode, spec);
+  if (textPassed) {
+    return { passed: true, errors: [], consoleOutput: execResult.consoleOutput, returnValue: execResult.returnValue };
+  }
+
+  return execResult;
 }
 
 /**
