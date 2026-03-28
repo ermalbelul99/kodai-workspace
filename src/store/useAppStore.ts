@@ -57,6 +57,10 @@ interface AppState {
   // Progress
   userProgress: UserProgress[];
   setUserProgress: (progress: UserProgress[]) => void;
+  addCompletedProgress: (progress: UserProgress) => void;
+
+  // XP
+  updateXP: (xpToAdd: number) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -107,6 +111,18 @@ export const useAppStore = create<AppState>()(
 
       userProgress: [],
       setUserProgress: (progress) => set({ userProgress: progress }),
+      addCompletedProgress: (progress) => set((state) => ({
+        userProgress: [...state.userProgress.filter(p => p.challenge_id !== progress.challenge_id), progress],
+      })),
+
+      updateXP: (xpToAdd) => set((state) => {
+        if (!state.profile) return {};
+        const newXP = state.profile.xp_points + xpToAdd;
+        const newLevel = Math.floor(newXP / 200) + 1;
+        return {
+          profile: { ...state.profile, xp_points: newXP, current_level: newLevel },
+        };
+      }),
     }),
     {
       name: 'kodai-app-store',

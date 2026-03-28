@@ -38,7 +38,7 @@ export const ChallengeCard = ({ challenge, progress, index, onClick }: Challenge
         "group relative w-full rounded-xl bg-card p-5 text-left transition-all duration-300",
         "border border-white/5 shadow-[0_0_20px_rgba(255,59,47,0.02)]",
         "hover:border-primary/40 hover:-translate-y-1",
-        isCompleted && "border-accent/30"
+        isCompleted && "border-accent/40 bg-accent/5 shadow-[0_0_20px_rgba(16,185,129,0.08)]"
       )}
     >
       {isCompleted && (

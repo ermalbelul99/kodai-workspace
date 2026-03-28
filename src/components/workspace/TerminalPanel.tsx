@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/store/useAppStore';
+import { supabase } from '@/integrations/supabase/client';
 import { Terminal, Play, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCallback } from 'react';
+import { validateChallenge } from '@/lib/validateChallenge';
 
 export const TerminalPanel = () => {
   const { t } = useTranslation();
@@ -13,24 +15,68 @@ export const TerminalPanel = () => {
   const editorCode = useAppStore((s) => s.editorCode);
   const activeChallenge = useAppStore((s) => s.activeChallenge);
   const triggerCelebration = useAppStore((s) => s.triggerCelebration);
+  const updateXP = useAppStore((s) => s.updateXP);
+  const addCompletedProgress = useAppStore((s) => s.addCompletedProgress);
+  const profile = useAppStore((s) => s.profile);
+  const userProgress = useAppStore((s) => s.userProgress);
 
-  const handleRunCode = useCallback(() => {
+  const handleRunCode = useCallback(async () => {
     clearTerminal();
     addTerminalLine({ content: '> Running code...', type: 'info' });
     addTerminalLine({ content: editorCode, type: 'output' });
 
-    if (activeChallenge) {
-      const mockSuccess = Math.random() > 0.3;
-      if (mockSuccess) {
-        addTerminalLine({ content: `✓ Output matches expected: "${activeChallenge.expected_output}"`, type: 'success' });
+    if (!activeChallenge) return;
+
+    // Check if already completed
+    const alreadyCompleted = userProgress.some(
+      (p) => p.challenge_id === activeChallenge.id && p.status === 'completed'
+    );
+
+    // Use real validation
+    const isCorrect = validateChallenge(editorCode, {
+      expectedCode: activeChallenge.expected_output,
+      pattern: new RegExp(activeChallenge.expected_output.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s*'), 'i'),
+    });
+
+    if (isCorrect) {
+      addTerminalLine({ content: `✓ Output matches expected: "${activeChallenge.expected_output}"`, type: 'success' });
+
+      if (!alreadyCompleted) {
         addTerminalLine({ content: `+${activeChallenge.xp_reward} XP earned!`, type: 'success' });
-        triggerCelebration();
+
+        // Update XP locally
+        updateXP(activeChallenge.xp_reward);
+
+        // Update XP in database
+        if (profile) {
+          const newXP = profile.xp_points + activeChallenge.xp_reward;
+          const newLevel = Math.floor(newXP / 200) + 1;
+          await supabase.from('profiles').update({
+            xp_points: newXP,
+            current_level: newLevel,
+          }).eq('id', profile.id);
+
+          // Save progress
+          const { data } = await supabase.from('user_progress').upsert({
+            user_id: profile.id,
+            challenge_id: activeChallenge.id,
+            status: 'completed',
+            submitted_code: editorCode,
+            completed_at: new Date().toISOString(),
+          }, { onConflict: 'user_id,challenge_id' }).select().single();
+
+          if (data) addCompletedProgress(data);
+        }
       } else {
-        addTerminalLine({ content: `✗ Expected: "${activeChallenge.expected_output}" but got different output`, type: 'error' });
-        addTerminalLine({ content: 'Try again! Hint: Check your return statement.', type: 'info' });
+        addTerminalLine({ content: '✓ Already completed — no additional XP.', type: 'info' });
       }
+
+      triggerCelebration();
+    } else {
+      addTerminalLine({ content: `✗ Expected: "${activeChallenge.expected_output}" but got different output`, type: 'error' });
+      addTerminalLine({ content: 'Try again! Hint: Check your code carefully.', type: 'info' });
     }
-  }, [clearTerminal, addTerminalLine, editorCode, activeChallenge, triggerCelebration]);
+  }, [clearTerminal, addTerminalLine, editorCode, activeChallenge, triggerCelebration, updateXP, addCompletedProgress, profile, userProgress]);
 
   return (
     <div className="flex h-full flex-col rounded-lg border border-border bg-terminal overflow-hidden">
