@@ -46,6 +46,10 @@ interface AppState {
   addTerminalLine: (line: Omit<TerminalLine, 'id'>) => void;
   clearTerminal: () => void;
 
+  // Celebration (non-persisted)
+  isCelebrating: boolean;
+  triggerCelebration: () => void;
+
   // Landing page code (preserved separately from workspace editorCode)
   landingCode: string;
   setLandingCode: (code: string) => void;
@@ -91,6 +95,12 @@ export const useAppStore = create<AppState>()(
         terminalLines: [...state.terminalLines, { ...line, id: crypto.randomUUID() }],
       })),
       clearTerminal: () => set({ terminalLines: [] }),
+
+      isCelebrating: false,
+      triggerCelebration: () => {
+        set({ isCelebrating: true });
+        setTimeout(() => set({ isCelebrating: false }), 3000);
+      },
 
       landingCode: '',
       setLandingCode: (code) => set({ landingCode: code }),
