@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/store/useAppStore';
 import { supabase } from '@/integrations/supabase/client';
-import { Terminal, Play, Trash2, Loader2 } from 'lucide-react';
+import { Terminal, Play, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { validateChallenge } from '@/lib/validateChallenge';
 
 export const TerminalPanel = () => {
@@ -19,44 +19,35 @@ export const TerminalPanel = () => {
   const addCompletedProgress = useAppStore((s) => s.addCompletedProgress);
   const profile = useAppStore((s) => s.profile);
   const userProgress = useAppStore((s) => s.userProgress);
-  const [isRunning, setIsRunning] = useState(false);
 
   const handleRunCode = useCallback(async () => {
-    if (isRunning) return;
-    setIsRunning(true);
     clearTerminal();
     addTerminalLine({ content: '> Running code...', type: 'info' });
+    addTerminalLine({ content: editorCode, type: 'output' });
 
-    if (!activeChallenge) {
-      addTerminalLine({ content: 'No active challenge selected.', type: 'error' });
-      setIsRunning(false);
-      return;
-    }
+    if (!activeChallenge) return;
 
     // Check if already completed
     const alreadyCompleted = userProgress.some(
       (p) => p.challenge_id === activeChallenge.id && p.status === 'completed'
     );
 
-    // Use the new async dual-path validation
-    const result = await validateChallenge(editorCode, {
+    // Use real validation
+    const isCorrect = validateChallenge(editorCode, {
       expectedCode: activeChallenge.expected_output,
-      expectedOutput: activeChallenge.expected_output,
-      language: (activeChallenge as any).language ?? 'javascript',
+      pattern: new RegExp(activeChallenge.expected_output.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s*'), 'i'),
     });
 
-    // Show actual output if available
-    if (result.output) {
-      addTerminalLine({ content: result.output, type: 'output' });
-    }
-
-    if (result.passed) {
+    if (isCorrect) {
       addTerminalLine({ content: `✓ Output matches expected: "${activeChallenge.expected_output}"`, type: 'success' });
 
       if (!alreadyCompleted) {
         addTerminalLine({ content: `+${activeChallenge.xp_reward} XP earned!`, type: 'success' });
+
+        // Update XP locally
         updateXP(activeChallenge.xp_reward);
 
+        // Update XP in database
         if (profile) {
           const newXP = profile.xp_points + activeChallenge.xp_reward;
           const newLevel = Math.floor(newXP / 200) + 1;
@@ -65,6 +56,7 @@ export const TerminalPanel = () => {
             current_level: newLevel,
           }).eq('id', profile.id);
 
+          // Save progress
           const { data } = await supabase.from('user_progress').upsert({
             user_id: profile.id,
             challenge_id: activeChallenge.id,
@@ -81,15 +73,10 @@ export const TerminalPanel = () => {
 
       triggerCelebration();
     } else {
-      if (result.error) {
-        addTerminalLine({ content: result.error, type: 'error' });
-      }
-      addTerminalLine({ content: `✗ Expected output: "${activeChallenge.expected_output}"`, type: 'error' });
-      addTerminalLine({ content: 'Try again! Check your code carefully.', type: 'info' });
+      addTerminalLine({ content: `✗ Expected: "${activeChallenge.expected_output}" but got different output`, type: 'error' });
+      addTerminalLine({ content: 'Try again! Hint: Check your code carefully.', type: 'info' });
     }
-
-    setIsRunning(false);
-  }, [isRunning, clearTerminal, addTerminalLine, editorCode, activeChallenge, triggerCelebration, updateXP, addCompletedProgress, profile, userProgress]);
+  }, [clearTerminal, addTerminalLine, editorCode, activeChallenge, triggerCelebration, updateXP, addCompletedProgress, profile, userProgress]);
 
   return (
     <div className="flex h-full flex-col rounded-lg border border-border bg-terminal overflow-hidden">
@@ -102,9 +89,9 @@ export const TerminalPanel = () => {
           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={clearTerminal}>
             <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
           </Button>
-          <Button size="sm" className="h-7 gap-1.5 text-xs font-mono" onClick={handleRunCode} disabled={isRunning}>
-            {isRunning ? <Loader2 className="h-3 w-3 animate-spin" /> : <Play className="h-3 w-3" />}
-            {isRunning ? t('common.running') ?? 'Running...' : t('common.run')}
+          <Button size="sm" className="h-7 gap-1.5 text-xs font-mono" onClick={handleRunCode}>
+            <Play className="h-3 w-3" />
+            {t('common.run')}
           </Button>
         </div>
       </div>
