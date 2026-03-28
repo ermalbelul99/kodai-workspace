@@ -49,6 +49,15 @@ const Dashboard = () => {
   const completedCount = userProgress.filter((p) => p.status === 'completed').length;
   const streak = Math.min(completedCount, 7);
 
+  // Filter challenges by user level
+  const levelToDifficulty = (level: number): string[] => {
+    if (level >= 3) return ['easy', 'medium', 'hard'];
+    if (level >= 2) return ['easy', 'medium'];
+    return ['easy'];
+  };
+  const allowedDifficulties = levelToDifficulty(profile?.current_level || 1);
+  const filteredChallenges = challenges.filter((c) => allowedDifficulties.includes(c.difficulty));
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
@@ -126,11 +135,11 @@ const Dashboard = () => {
             <Target className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-bold text-foreground">{t('dashboard.challenges')}</h2>
             <span className="font-mono text-xs text-muted-foreground">
-              {completedCount}/{challenges.length} {t('dashboard.completed')}
+              {completedCount}/{filteredChallenges.length} {t('dashboard.completed')}
             </span>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {challenges.map((challenge, i) => (
+            {filteredChallenges.map((challenge, i) => (
               <ChallengeCard
                 key={challenge.id}
                 challenge={challenge}
