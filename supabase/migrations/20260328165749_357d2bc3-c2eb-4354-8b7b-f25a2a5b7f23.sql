@@ -1,0 +1,1 @@
+ALTER TABLE public.user_progress ADD CONSTRAINT user_progress_user_challenge_unique UNIQUE (user_id, challenge_id);
