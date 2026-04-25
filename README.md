@@ -1,73 +1,69 @@
-# Welcome to your Lovable project
+# KodAI Workspace
 
-## Project info
+A web-based coding workspace for students to solve programming challenges, run code live in the browser UI, and validate solutions automatically.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Core features
 
-## How can I edit this code?
+### 1) Challenge system
+Each challenge includes:
+- **title / description**
+- **difficulty + XP reward**
+- **expected output** (or markup expectations for HTML/CSS challenges)
 
-There are several ways of editing your application.
+User progress is stored so completed challenges can award XP only once.
 
-**Use Lovable**
+### 2) Live code execution
+When a student clicks **Run**, the app sends the editor code to a remote execution engine (currently Piston) and captures:
+- `stdout` (normal output)
+- `stderr` (runtime/compiler errors)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+The Terminal panel displays:
+- the “Running code…” status
+- program output or runtime errors
+- success/failure feedback
 
-Changes made via Lovable will be committed automatically to this repo.
+### 3) Output-based validation (important)
+Validation should be based on **runtime output**, not by comparing the student’s source code text.
 
-**Use your preferred IDE**
+The project contains:
+- A detailed validator that executes code and compares `stdout` to the expected output.
+- Markup validation for HTML/CSS challenges using DOM parsing and required selectors.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 4) XP + progress tracking
+On successful validation:
+- the student earns XP (if not already completed)
+- progress is saved (e.g., challenge completion timestamp + submitted code)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Tech stack
+- Vite + React + TypeScript
+- Monaco Editor
+- Tailwind + shadcn-ui
+- Supabase (auth/profile/progress storage)
 
-Follow these steps:
+## Development
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Install
+```bash
+npm install
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Run locally
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Build
+```bash
+npm run build
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Environment variables
+Create a `.env` file (or use your hosting provider’s env settings). At minimum you will need your Supabase keys.
 
-**Use GitHub Codespaces**
+If you use a hosted Piston instance that requires authorization, you may also need an API key/token.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Notes on code execution providers
+Public execution APIs may require an API key or may impose limits. For production use, consider running your own execution service instance.
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## License
+Add a license file if you plan to open-source this project.
