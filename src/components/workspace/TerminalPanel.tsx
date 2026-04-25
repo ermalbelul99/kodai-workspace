@@ -5,7 +5,8 @@ import { Terminal, Play, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCallback } from 'react';
-import { validateChallenge } from '@/lib/validateChallenge';
+// Replace validateChallenge with validateChallengeDetailed
+import { validateChallengeDetailed } from '@/lib/validateChallenge';
 
 export const TerminalPanel = () => {
   const { t } = useTranslation();
@@ -32,14 +33,15 @@ export const TerminalPanel = () => {
       (p) => p.challenge_id === activeChallenge.id && p.status === 'completed'
     );
 
-    // Use real validation
-    const isCorrect = validateChallenge(editorCode, {
-      expectedCode: activeChallenge.expected_output,
-      pattern: new RegExp(activeChallenge.expected_output.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s*'), 'i'),
+    // Use real execution validation
+    const result = await validateChallengeDetailed(editorCode, {
+      expectedOutput: activeChallenge.expected_output,
+      language: activeChallenge.language // Make sure to pass the current language (e.g., 'cpp', 'javascript')
     });
 
-    if (isCorrect) {
-      addTerminalLine({ content: `✓ Output matches expected: "${activeChallenge.expected_output}"`, type: 'success' });
+    if (result.isValid) {
+      addTerminalLine({ content: result.message || `✓ Output matches expected: "${activeChallenge.expected_output}"`, type: 'success' });
+      
 
       if (!alreadyCompleted) {
         addTerminalLine({ content: `+${activeChallenge.xp_reward} XP earned!`, type: 'success' });
@@ -67,13 +69,13 @@ export const TerminalPanel = () => {
 
           if (data) addCompletedProgress(data);
         }
+       } else {
+      // If it fails, output the actual error or mismatch provided by the Piston API
+      if (result.actual) {
+        addTerminalLine({ content: `✗ Expected: "${activeChallenge.expected_output}" but got: "${result.actual}"`, type: 'error' });
       } else {
-        addTerminalLine({ content: '✓ Already completed — no additional XP.', type: 'info' });
+        addTerminalLine({ content: `✗ ${result.message}`, type: 'error' });
       }
-
-      triggerCelebration();
-    } else {
-      addTerminalLine({ content: `✗ Expected: "${activeChallenge.expected_output}" but got different output`, type: 'error' });
       addTerminalLine({ content: 'Try again! Hint: Check your code carefully.', type: 'info' });
     }
   }, [clearTerminal, addTerminalLine, editorCode, activeChallenge, triggerCelebration, updateXP, addCompletedProgress, profile, userProgress]);
