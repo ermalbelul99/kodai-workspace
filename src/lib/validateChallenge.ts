@@ -1,4 +1,5 @@
-const PISTON_EXECUTE_URL = 'https://emkc.org/api/v2/piston/execute';
+const PISTON_EXECUTE_URL =
+  import.meta.env.VITE_PISTON_URL ?? 'https://emkc.org/api/v2/piston/execute';
 const MARKUP_LANGUAGES = new Set(['html', 'css']);
 const EXECUTION_TIMEOUT_MS = 8_000; // 8 seconds
 const MAX_RUNTIME_ERROR_LENGTH = 400;
@@ -61,6 +62,28 @@ function isMarkupLanguage(language?: string): boolean {
   return MARKUP_LANGUAGES.has(language.toLowerCase());
 }
 
+/**
+ * Maps platform language identifiers to the Piston runtime names.
+ * The local Docker instance uses different names than the public emkc.org API
+ * for some languages (e.g. JavaScript runs under the "node" runtime).
+ */
+const PISTON_LANGUAGE_MAP: Record<string, string> = {
+  javascript: 'node',
+  typescript: 'typescript',
+  python: 'python',
+  java: 'java',
+  csharp: 'csharp.net',
+  'c#': 'csharp.net',
+  cpp: 'gcc',
+  'c++': 'gcc',
+  go: 'go',
+  rust: 'rust',
+};
+
+function toPistonLanguage(language: string): string {
+  return PISTON_LANGUAGE_MAP[language.toLowerCase()] ?? language;
+}
+
 async function executeWithPiston(userCode: string, language: string): Promise<PistonExecuteResult> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), EXECUTION_TIMEOUT_MS);
@@ -71,8 +94,7 @@ async function executeWithPiston(userCode: string, language: string): Promise<Pi
       headers: { 'Content-Type': 'application/json' },
       signal: controller.signal,
       body: JSON.stringify({
-        // Intentionally mirrors requested payload mapping contract.
-        language: language === 'javascript' ? 'javascript' : language,
+        language: toPistonLanguage(language),
         version: '*',
         files: [{ content: userCode }],
       }),
